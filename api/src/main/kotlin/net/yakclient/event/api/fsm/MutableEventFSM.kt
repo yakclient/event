@@ -3,11 +3,10 @@ package net.yakclient.event.api.fsm
 import net.yakclient.event.api.EventData
 import java.util.function.Predicate
 
-public class EventFSMScope(
+public class MutableEventFSM(
     debug: Boolean = false
 ) : EventFSM(StatePlaceholder(), debug) {
     public val ref: FSMReference = FSMReference(this)
-//    internal val neededDispatchers: MutableMap<String, Class<out EventDispatcher<*>>> = HashMap()
 
     public fun of(name: String = EventState.defaultName()): MutableEventState =
         of(TypedPredicateEventState(name, ArrayList()))
@@ -35,6 +34,10 @@ public class EventFSMScope(
         private inner class FromTransitionProvider(
             to: EventState
         ) : TransitionProvider(to) {
+            override fun with(): Transition =
+                super.with().also { add(it) }
+
+
             override fun <T : EventData> with(
                 type: Class<T>,
                 predicate: Predicate<T>
@@ -52,7 +55,7 @@ public class EventFSMScope(
     public open inner class TransitionProvider internal constructor(
         private val to: EventState
     ) {
-        public fun with(): Transition = Transition(to, ref)
+        public open fun with(): Transition = Transition(to, ref)
 
         public open fun <T : EventData> with(
             type: Class<T>,
@@ -73,11 +76,11 @@ public class EventFSMScope(
     }
 }
 
-public inline fun <reified T : EventData> EventFSMScope.TransitionProvider.with(p: Predicate<T>): Transition =
+public inline fun <reified T : EventData> MutableEventFSM.TransitionProvider.with(p: Predicate<T>): Transition =
     with(T::class.java, p)
 
-public inline fun <reified T : EventData> EventFSMScope.TransitionProvider.withTime(p: Predicate<TimedEventState.TimedEventData<T>>): TimedTransition<T> =
+public inline fun <reified T : EventData> MutableEventFSM.TransitionProvider.withTime(p: Predicate<TimedEventState.TimedEventData<T>>): TimedTransition<T> =
     withTime(T::class.java, p)
 
-public infix fun EventFSMScope.MutableEventState.transitionsTo(state: EventState): EventFSMScope.TransitionProvider =
+public infix fun MutableEventFSM.MutableEventState.transitionsTo(state: EventState): MutableEventFSM.TransitionProvider =
     transitionsTo(state)

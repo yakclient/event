@@ -10,7 +10,7 @@ public object EventDispatchManager {
         subscriber.also { subscribers[subscriber::class.java.name] = it }
 
     public fun <T : EventData> load(type: Class<out EventDispatcher<T>>): EventDispatcher<T> =
-        (subscribers[type.name] ?: (ServiceLoader.load(type).firstOrNull()?.also { subscribers[type.name] = it }
+        (subscribers[type.name] ?: (ServiceLoader.load(EventDispatcher::class.java).firstOrNull { type.isAssignableFrom(it::class.java) }?.also { subscribers[type.name] = it }
             ?: throw IllegalStateException("Failed to find hook subscriber for type ${type.name}"))) as EventDispatcher<T>
 
     public fun <T: EventData> typeOf(type: Class<out EventDispatcher<T>>) : Class<T> = load(type).eventType

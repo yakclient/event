@@ -2,7 +2,7 @@ package net.yakclient.event.api.test.fsm
 
 
 import net.yakclient.event.api.EventData
-import net.yakclient.event.api.fsm.EventFSMScope
+import net.yakclient.event.api.fsm.MutableEventFSM
 import net.yakclient.event.api.fsm.transitionsTo
 import net.yakclient.event.api.fsm.with
 import net.yakclient.event.api.fsm.withTime
@@ -24,7 +24,7 @@ class BasicFSMTests {
 
         //TODO https://github.com/evanw/fsm UI for generating this stuff dynamically from this
         // This whole example represents a mouse moving into a box, clicking, and then pressing a key which triggers a print statement.
-        val fsm = EventFSMScope(true).apply {
+        val fsm = MutableEventFSM(true).apply {
             //STATES
             val initial = of("Starting state")
             val inBox = of("Mouse inside box")
@@ -85,7 +85,7 @@ class BasicFSMTests {
 
     @Test
     fun testWithTiming() {
-        val fsm = EventFSMScope(true).apply {
+        val fsm = MutableEventFSM(true).apply {
             val initialTimed = timedOf("Initial")
             val second = of("First timed one")
             val lastOne = of("Last")
@@ -110,6 +110,22 @@ class BasicFSMTests {
         fsm.dispatch(TestEventOne())
         fsm.dispatch(TestEventOne())
     }
+
+    @Test
+    fun testTimingOutState() {
+        val fsm = MutableEventFSM(true).apply {
+            val initial = of("Initial")
+            val timingOut = timingOutOf(initial, 1000, "Some name")
+
+            (initial transitionsTo timingOut).with()
+        }
+
+        fsm.dispatch(TestEventOne())
+
+        sleep(10000)
+    }
+
+
 }
 
 

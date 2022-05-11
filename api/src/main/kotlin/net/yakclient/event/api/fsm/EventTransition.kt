@@ -10,6 +10,6 @@ public class EventTransition(to: EventState, ref: FSMReference, private val even
     }
 }
 
-public fun EventFSMScope.eventTransition(to: EventState, consumer: Consumer<EventData>): EventTransition =
+public fun MutableEventFSM.eventTransition(to: EventState, consumer: Consumer<EventData>): EventTransition =
     EventTransition(to, ref, consumer)
 

@@ -10,7 +10,7 @@ public open class TypedPredicateEventState(
     public override val name: String = name ?: "unnamed@${System.identityHashCode(this)}"
 
     override fun <T : EventData> find(event: T): Transition? =
-        exits.filterIsInstance<TypedPredicateTransition<*>>().find { it.type.isAssignableFrom(event::class.java) }
+        exits.filterIsInstance<TypedPredicateTransition<*>>().find { it.type.isAssignableFrom(event::class.java) } ?: exits.firstOrNull()
 }
 
 public class TypedPredicateTransition<T : EventData>(

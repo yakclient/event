@@ -15,7 +15,6 @@ public open class TimedEventState(
         last = Instant.now()
     }
 
-
     override fun <T : EventData> accept(event: T): Unit = find(event)?.run {
         this@run.accept(if (this@run is TimedTransition<*>) TimedEventData(event, last) else event)
         last = Instant.now()
@@ -27,10 +26,6 @@ public open class TimedEventState(
         } ?: exits.filterIsInstance<TypedPredicateTransition<*>>().find {
             it.type.isAssignableFrom(event::class.java)
         }
-
-//    override fun <T : EventData> accept(event: T) {
-//        (exits.filterIsInstance<TimedTransition<T>>().find { event::class.java.isAssignableFrom(it.type) }).accept(TimedEventData(event, Instant.now()))
-//    }
 
     public data class TimedEventData<T : EventData>(
         public val data: T,
