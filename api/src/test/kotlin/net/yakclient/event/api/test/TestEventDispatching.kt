@@ -7,6 +7,7 @@ import kotlin.test.Test
 class TestEventDispatching {
     @Test
     fun `Test dispatcher loading`() {
-        EventDispatchManager.load(TestEventOneDispatcher::class.java)
+        EventDispatchManager.add(TestEventOneDispatcher())
+        EventDispatchManager.load(SuperDispatcher::class.java)
     }
 }

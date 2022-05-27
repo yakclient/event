@@ -1,19 +1,22 @@
 package net.yakclient.event.api
 
+import net.yakclient.common.util.ListServiceCollector
+import net.yakclient.common.util.MappedServiceCollector
+import net.yakclient.common.util.ServiceCollector
 import java.util.*
 import kotlin.collections.HashMap
 
-public object EventDispatchManager {
-    private val subscribers: MutableMap<String, EventDispatcher<*>> = HashMap()
-
-    public fun <T : EventData> overload(subscriber: EventDispatcher<T>): EventDispatcher<T> =
-        subscriber.also { subscribers[subscriber::class.java.name] = it }
+public object EventDispatchManager : ListServiceCollector<EventDispatcher<*>>() {
+    private fun <T: EventData> find(type: Class<out EventDispatcher<T>>) : EventDispatcher<*>? = services.find {
+        type.isAssignableFrom(it::class.java)
+    }
 
     public fun <T : EventData> load(type: Class<out EventDispatcher<T>>): EventDispatcher<T> =
-        (subscribers[type.name] ?: (ServiceLoader.load(EventDispatcher::class.java).firstOrNull { type.isAssignableFrom(it::class.java) }?.also { subscribers[type.name] = it }
-            ?: throw IllegalStateException("Failed to find hook subscriber for type ${type.name}"))) as EventDispatcher<T>
+        (find(type) as? EventDispatcher<T>)
+            ?: throw IllegalArgumentException("Type: ${type.name} is not a registered event dispatcher!")
 
-    public fun <T: EventData> typeOf(type: Class<out EventDispatcher<T>>) : Class<T> = load(type).eventType
+    public fun <T : EventData> typeOf(type: Class<out EventDispatcher<T>>): Class<T> = load(type).eventType
 
-    public fun <T: EventData> findSubscriber(type: Class<T>) : Class<out EventDispatcher<T>>? = subscribers.values.firstOrNull { type.isAssignableFrom(it.eventType) } as? Class<out EventDispatcher<T>>?
+    public fun <T : EventData> findSubscriber(type: Class<T>): Class<out EventDispatcher<T>>? =
+        services.find { type.isAssignableFrom(it.eventType) } as? Class<out EventDispatcher<T>>?
 }

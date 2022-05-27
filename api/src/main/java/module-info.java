@@ -5,6 +5,7 @@ module yakclient.event.api {
 
     requires java.logging;
     requires kotlinx.coroutines.core.jvm;
+    requires yakclient.common.util;
 
     exports net.yakclient.event.api;
     exports net.yakclient.event.api.fsm;

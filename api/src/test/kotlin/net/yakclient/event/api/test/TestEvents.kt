@@ -6,7 +6,9 @@ import net.yakclient.event.api.EventDispatcher
 val testEventOne: Class<TestEventOneDispatcher> = TestEventOneDispatcher::class.java
 val testEventTwo: Class<TestEventTwoDispatcher> = TestEventTwoDispatcher::class.java
 
-class TestEventOneDispatcher : EventDispatcher<TestEventOne>() {
+abstract class SuperDispatcher: EventDispatcher<TestEventOne>()
+
+class TestEventOneDispatcher : SuperDispatcher() {
     override val eventType: Class<TestEventOne>
         get() = TestEventOne::class.java
 }
