@@ -1,12 +1,8 @@
 package net.yakclient.event.api
 
-import net.yakclient.common.util.ListServiceCollector
-import net.yakclient.common.util.MappedServiceCollector
-import net.yakclient.common.util.ServiceCollector
-import java.util.*
-import kotlin.collections.HashMap
+import net.yakclient.common.util.ServiceListCollector
 
-public object EventDispatchManager : ListServiceCollector<EventDispatcher<*>>() {
+public object EventDispatchManager : ServiceListCollector<EventDispatcher<*>>() {
     private fun <T: EventData> find(type: Class<out EventDispatcher<T>>) : EventDispatcher<*>? = services.find {
         type.isAssignableFrom(it::class.java)
     }
